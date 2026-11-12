@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71eace829f07d254fb63560ca9f2cbc9, type: 3}
+  m_Name: TreeData
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  displayName: Tree
+  maxStack: 10
+  prefab: {fileID: 310251983402806878, guid: 7c8da28ba29981440b8bb4c0fe832ded, type: 3}
+  spawnWeight: 9
+  maxHealth: 50
+  respawnSeconds: 300
+  harvestMode: 0
+  drop:
+    item: {fileID: 11400000, guid: 02f37a5d0f0131c4c8ad699e06726898, type: 2}
