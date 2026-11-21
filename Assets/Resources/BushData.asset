@@ -14,10 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
   displayName: Bush
   maxStack: 10
-  prefab: {fileID: 6940289957271546711, guid: f3ce3fb2204da36448449a5b0c0e4bd6, type: 3}
-  spawnWeight: 7
+  prefab: {fileID: 740014786114711066, guid: e62b37408f42bb84cbba9b5688bc97a8, type: 3}
+  spawnWeight: 1.75
   maxHealth: 10
   respawnSeconds: 300
   harvestMode: 0
   drop:
     item: {fileID: 11400000, guid: 1c9b98f84a83b0b42b1ce6b846cf7d69, type: 2}
+  icon: {fileID: 0}

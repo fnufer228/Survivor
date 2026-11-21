@@ -52,6 +52,14 @@ MonoBehaviour:
   - RPC_Spawn
   - RPC_Died
   - RPC_RequestDamage
+  - RPC_Cancelled
+  - RPC_Completed
+  - RPC_Delivered
+  - RPC_Refund
+  - RPC_RequestCancel
+  - RPC_RequestDeliver
+  - RPC_RequestPlace
+  - RPC_SitePlaced
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 0

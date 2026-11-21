@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71eace829f07d254fb63560ca9f2cbc9, type: 3}
+  m_Name: BushData_D
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  displayName: Bush
+  maxStack: 10
+  prefab: {fileID: 4789895326184438286, guid: a54e39a2552febb4498daf8883edf5fa, type: 3}
+  spawnWeight: 1.75
+  maxHealth: 10
+  respawnSeconds: 300
+  harvestMode: 0
+  drop:
+    item: {fileID: 11400000, guid: 1c9b98f84a83b0b42b1ce6b846cf7d69, type: 2}
+  icon: {fileID: 0}

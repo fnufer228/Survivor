@@ -14,10 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
   displayName: Tree
   maxStack: 10
-  prefab: {fileID: 310251983402806878, guid: 7c8da28ba29981440b8bb4c0fe832ded, type: 3}
-  spawnWeight: 9
+  prefab: {fileID: 4795777424397389642, guid: 72cc8534844f1dd4091eda7f39a6cc6a, type: 3}
+  spawnWeight: 2.25
   maxHealth: 50
   respawnSeconds: 300
   harvestMode: 0
   drop:
     item: {fileID: 11400000, guid: 02f37a5d0f0131c4c8ad699e06726898, type: 2}
+  icon: {fileID: 0}

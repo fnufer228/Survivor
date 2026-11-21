@@ -85,6 +85,7 @@ public class NetworkMenuManager : MonoBehaviourPunCallbacks
         SetStatus("Connected. Ready to play!");
         SetPlayButton(true);
         PhotonNetwork.JoinLobby();
+        CursorController.Set(this, true);
     }
 
     public override void OnDisconnected(DisconnectCause cause)

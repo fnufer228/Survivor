@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 233709055a7be0447be582a7d650a449, type: 3}
+  m_Name: Bonfire
+  m_EditorClassIdentifier: Assembly-CSharp::BuildingRecipe
+  displayName: Bonfire
+  description: 
+  picture: {fileID: -4701791936034880536, guid: fd0ebe3ce440f7244839de340ecabd9c, type: 3}
+  costs:
+  - resource: {fileID: 0}
+    amount: 5
+  - resource: {fileID: 0}
+    amount: 10
+  buildingPrefab: {fileID: 8060533066185464670, guid: a4dcd663498ecf448886e3031f7d3ad1, type: 3}
+  ghostPrefab: {fileID: 8060533066185464670, guid: a4dcd663498ecf448886e3031f7d3ad1, type: 3}
+  rotationStep: 15
+  groundOffset: 0

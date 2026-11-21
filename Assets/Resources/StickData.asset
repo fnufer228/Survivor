@@ -21,5 +21,4 @@ MonoBehaviour:
   harvestMode: 1
   drop:
     item: {fileID: 0}
-    min: 1
-    max: 1
+  icon: {fileID: -320402038267080640, guid: c8b6e323ca61d3848905ee50d9fc3a46, type: 3}

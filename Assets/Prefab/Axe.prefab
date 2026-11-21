@@ -26,9 +26,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2050374416565574139}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.000000081460335, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: -0.00000004371139}
+  m_LocalPosition: {x: 0.07854839, y: 0.05247209, z: -0.0001340876}
+  m_LocalScale: {x: 0.9400568, y: 0.9400568, z: 0.9400568}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3010132485112715851}
@@ -40,7 +40,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2050374416565574139}
-  m_Mesh: {fileID: 7091500709883988191, guid: 69cfafbb1243c0e43a3d66e32c4c0d2f, type: 3}
+  m_Mesh: {fileID: -8287839383430266118, guid: 80f98138a01437d49bfda2d915c2532c, type: 3}
 --- !u!23 &8726904634785645508
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -66,7 +66,16 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 965dc12f4972bb042917547318baaf7b, type: 2}
+  - {fileID: 2100000, guid: 84f42cf939f081d4eae2ed3c3f9ebf6c, type: 2}
+  - {fileID: 2100000, guid: 6fe200f9ba9fef6499d2b4ce5dd2489b, type: 2}
+  - {fileID: 2100000, guid: 36c17909f39ed7e44bd060e5fd4b2a13, type: 2}
+  - {fileID: 2100000, guid: 8ec96b212c2482a4b8d22a6f527dffa2, type: 2}
+  - {fileID: 2100000, guid: b98b9c2fe4058a941875caac0d1f448f, type: 2}
+  - {fileID: 2100000, guid: 04f8bc3260ce33b49b25f1595a63704e, type: 2}
+  - {fileID: 2100000, guid: 4921765c0ac9d7b49b8d7bd29fd391ce, type: 2}
+  - {fileID: 2100000, guid: 60ec6e503ccb5314b85207b28c43b755, type: 2}
+  - {fileID: 2100000, guid: 23b0d6ba861125d47be23d9243dfa532, type: 2}
+  - {fileID: 2100000, guid: fc4e264f74644cb479183dec9bffe2c0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -135,4 +144,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80755216b2e000740965e46e9cbd776b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WorldItem
-  itemData: {fileID: 11400000, guid: b945aa10fdf17bb4ba1171baea5c5061, type: 2}
+  resourceType: {fileID: 0}
