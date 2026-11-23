@@ -30,8 +30,7 @@ public class InventoryUI : MonoBehaviour
     {
         isOpen = state;
 
-        Cursor.visible = state;
-        Cursor.lockState = state ? CursorLockMode.None : CursorLockMode.Locked;
+        CursorController.Set(this, state);
 
         ResolveLocalPlayer();
 

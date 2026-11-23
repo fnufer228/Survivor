@@ -13,7 +13,7 @@ public class PlayerCombat : MonoBehaviourPun
 
     void Update()
     {
-        if (!photonView.IsMine || Time.time < nextAttack || !Input.GetMouseButtonDown(0)) return;
+        if (!photonView.IsMine || Time.time < nextAttack || !Input.GetMouseButtonDown(0) || BuildPlacer.BlocksMouse) return;
         nextAttack = Time.time + cooldown;
 
         Transform origin = cam.transform;

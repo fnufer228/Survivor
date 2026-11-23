@@ -6,7 +6,8 @@ public class ResourceNode : MonoBehaviour, IDamageable, IInteractable
     public int Id { get; private set; }
     public ResourceType Type { get; private set; }
     public string Prompt => Type != null ? Type.displayName : string.Empty;
-    public bool CanInteract => Type != null && Type.harvestMode == HarvestMode.Pickup;
+    public bool IsRegistered { get; private set; }
+    public bool CanInteract => IsRegistered && Type != null && Type.harvestMode == HarvestMode.Pickup;
  
     [SerializeField] private ResourceType resourceType;
     
@@ -30,6 +31,7 @@ public class ResourceNode : MonoBehaviour, IDamageable, IInteractable
     {
         Id = id;
         Type = type;
+        IsRegistered = true;
         baseScale = transform.localScale;
         baseRotation = transform.localRotation;
         if(resourceType == null)
@@ -42,7 +44,6 @@ public class ResourceNode : MonoBehaviour, IDamageable, IInteractable
         transform.localScale = baseScale;
         transform.localRotation = baseRotation;
         gameObject.SetActive(false);
-        Debug.Log(resourceType.displayName);
     }
  
     public void PlayHit()
@@ -81,7 +82,7 @@ public class ResourceNode : MonoBehaviour, IDamageable, IInteractable
     }
     public void TakeHit(int damage)
     {
-        if (Type == null || Type.harvestMode != HarvestMode.Hit) return;
+        if (!IsRegistered || Type == null || Type.harvestMode != HarvestMode.Hit) return;
         if (ResourceManager.Instance != null) ResourceManager.Instance.Hit(this, damage);
     }
  

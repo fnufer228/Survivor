@@ -4,17 +4,16 @@ using UnityEngine.Serialization;
 
 public enum HarvestMode
 {
-        Hit,
-        Pickup
+    Hit,
+    Pickup
 }
 
 [Serializable]
 public class DropEntry
 {
     public PickupItemType item;
-    //public int min = 1;
-    //public int max = 1;
-
+    [Min(0)] public int min = 1;
+    [Min(0)] public int max = 1;
 }
 [CreateAssetMenu(fileName = "NewResource", menuName = "Data")]
 public class ResourceType : ScriptableObject

@@ -18,11 +18,11 @@ public class ItemDatabase : MonoBehaviour
         Instance = this;
     }
 
-    public ResourceType GetItem(string Name)
+    public ResourceType GetItem(string displayName)
     {
         foreach (ResourceType item in items)
         {
-            if (item.displayName == name)
+            if (item != null && item.displayName == displayName)
                 return item;
         }
 

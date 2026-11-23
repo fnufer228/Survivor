@@ -37,6 +37,9 @@ public class RecipeBookUI : MonoBehaviour
         if (previousButton != null) previousButton.onClick.AddListener(PreviousSpread);
         if (nextButton != null) nextButton.onClick.AddListener(NextSpread);
 
+        if (root == gameObject)
+            Debug.LogError("RecipeBookUI: Root must be a child object, otherwise the book can not be opened again", this);
+
         root.SetActive(false);
         IsOpen = false;
     }
@@ -44,6 +47,7 @@ public class RecipeBookUI : MonoBehaviour
     void OnDestroy()
     {
         IsOpen = false;
+        CursorController.Hide(this);
     }
 
     void Update()

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Photon.Pun;
-using Photon.Pun.Demo.Cockpit;
 using UnityEngine;
 
 [RequireComponent(typeof(PhotonView))]
@@ -26,32 +25,28 @@ public class DropManager : MonoBehaviourPunCallbacks
 
     int nextId;
     float nextCheck;
+    bool stateRequested;
 
     void Awake() => Instance = this;
 
-    void Start()
+    void Start() => RequestStateIfNeeded();
+
+    public override void OnJoinedRoom() => RequestStateIfNeeded();
+
+    void RequestStateIfNeeded()
     {
-        RequestStateIfNeeded();
+        if (stateRequested || !PhotonNetwork.InRoom || PhotonNetwork.IsMasterClient) return;
+        stateRequested = true;
+        photonView.RPC(nameof(RPC_RequestState), RpcTarget.MasterClient);
     }
 
-    public override void OnJoinedRoom()
-    {
-        RequestStateIfNeeded();
-    }
-
-
-    private void RequestStateIfNeeded()
-    {
-        if (PhotonNetwork.InRoom && !PhotonNetwork.IsMasterClient)
-            photonView.RPC(nameof(RPC_RequestState), RpcTarget.MasterClient);
-    }
     public void SpawnDrops(DropEntry entry, Vector3 center)
     {
-        if (!PhotonNetwork.IsMasterClient || entry == null) return;
+        if (!PhotonNetwork.IsMasterClient || entry == null || entry.item == null) return;
 
-            //int amount = Random.Range(entry.min, Mathf.Max(entry.min, entry.max) + 1);
-            int amount = entry.item.amount;
-            for (int i = 0; i < amount; i++) Spawn(entry.item, center);
+        int min = Mathf.Max(0, entry.min);
+        int amount = Random.Range(min, Mathf.Max(min, entry.max) + 1);
+        for (int i = 0; i < amount; i++) Spawn(entry.item, center);
     }
 
     public void Spawn(PickupItemType type, Vector3 center)
@@ -126,8 +121,8 @@ public class DropManager : MonoBehaviourPunCallbacks
         PickupItemType type = item.Type;
         RemoveLocal(id);
 
-        if (actor == PhotonNetwork.LocalPlayer.ActorNumber)
-            Loot.GiveLocal(type.itemId, type.amount);
+        if (actor == PhotonNetwork.LocalPlayer.ActorNumber && type != null)
+            Loot.GiveLocal(type.ResolveInventoryItem(), type.amount);
     }
 
     void Update()

@@ -95,7 +95,15 @@ public class ResourceManager : MonoBehaviourPunCallbacks
         var rng = new System.Random(seed);
 
         float totalWeight = 0f;
-        foreach (var t in types) totalWeight += t.spawnWeight;
+        foreach (var t in types)
+        {
+            if (t == null || t.prefab == null)
+            {
+                Debug.LogError("ResourceManager: Types has an empty entry or a type without prefab", this);
+                return;
+            }
+            totalWeight += Mathf.Max(0f, t.spawnWeight);
+        }
 
         for (int i = 0; i < count; i++)
         {
@@ -143,13 +151,6 @@ public class ResourceManager : MonoBehaviourPunCallbacks
         photonView.RPC(nameof(RPC_RequestHit), RpcTarget.MasterClient, node.Id, dmg);
     }
 
-    bool SenderIsClose(Player sender, Vector3 pos)
-    {
-        if (sender.TagObject is GameObject player)
-            return (player.transform.position - pos).sqrMagnitude <= maxReachDistance * maxReachDistance;
-        return true;
-    }
-
     [PunRPC]
     void RPC_Hit(int id)
     {
@@ -162,10 +163,15 @@ public class ResourceManager : MonoBehaviourPunCallbacks
         if (!IsValid(id)) return;
 
         removedAt[id] = serverTime;
-        nodes[id].Hide();
+        ResourceNode node = nodes[id];
+        node.Hide();
 
-        if (actor == PhotonNetwork.LocalPlayer.ActorNumber)
-            LocalHarvested?.Invoke(nodes[id].Type);
+        if (actor != PhotonNetwork.LocalPlayer.ActorNumber) return;
+
+        if (node.Type.harvestMode == HarvestMode.Pickup)
+            Loot.GiveLocal(node.Type, 1);
+
+        LocalHarvested?.Invoke(node.Type);
     }
 
     void Update()
@@ -273,7 +279,7 @@ public class ResourceManager : MonoBehaviourPunCallbacks
  
     void SpawnWorldDrops(ResourceNode node)
     {
-        if(node.Type.drop == null || node.Type.harvestMode == HarvestMode.Pickup) return;
+        if (node.Type.drop == null || node.Type.drop.item == null || node.Type.harvestMode == HarvestMode.Pickup) return;
         if (DropManager.Instance != null)
             DropManager.Instance.SpawnDrops(node.Type.drop, node.transform.position);
     }

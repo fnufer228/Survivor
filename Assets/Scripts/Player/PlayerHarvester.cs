@@ -6,98 +6,69 @@ public class PlayerHarvester : MonoBehaviourPun
     [SerializeField] private Camera playerCamera;
     [SerializeField] private float pickupDistance = 3f;
     [SerializeField] private KeyCode pickupKey = KeyCode.E;
+
+    [Tooltip("Resource, PickUp and Blueprint layers")]
     [SerializeField] private LayerMask layer;
 
-    private ResourceNode _currentItem;
+    private IInteractable _current;
+    private Component _currentComponent;
+
+    public string CurrentPrompt => _current != null ? _current.Prompt : string.Empty;
 
     private void Update()
     {
-        if (!photonView.IsMine) return;
-        CheckForItem();
+        if (!photonView.IsMine || playerCamera == null) return;
 
-        if (_currentItem != null && Input.GetKeyDown(pickupKey))
-            Pickup();
-    }
-
-    private void CheckForItem()
-    {
-        ResourceNode targetItem = null;
-
-        Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
-
-        if (Physics.Raycast(ray, out RaycastHit hit, pickupDistance, layer))
+        if (RecipeBookUI.IsOpen)
         {
-            Debug.Log(hit.transform.name);
-            targetItem = hit.collider.GetComponentInParent<ResourceNode>();
-        }
-        else
-        {
-            Debug.Log("not Found");
-        }
-        if (targetItem == _currentItem)
+            SetCurrent(null);
             return;
+        }
 
-        SetHighlight(_currentItem, false);
-        _currentItem = targetItem;
-        SetHighlight(_currentItem, true);
+        SetCurrent(FindTarget());
+
+        if (_current != null && Input.GetKeyDown(pickupKey))
+            _current.Interact();
     }
 
-    private static bool CanPickup(ResourceNode node)
+    private IInteractable FindTarget()
     {
-        if (node == null) return false;
-        DroppedItem dropped = node.GetComponent<DroppedItem>();
-        if (dropped != null) return dropped.CanInteract;
-        return node.CanInteract;
+        Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
+        if (!Physics.Raycast(ray, out RaycastHit hit, pickupDistance, layer, QueryTriggerInteraction.Collide))
+            return null;
+
+        foreach (IInteractable interactable in hit.collider.GetComponentsInParent<IInteractable>())
+        {
+            if (interactable.CanInteract) return interactable;
+        }
+
+        return null;
     }
 
-    private static void SetHighlight(ResourceNode node, bool on)
+    private void SetCurrent(IInteractable target)
     {
-        if (node == null) return;
-        if (on && CanPickup(node)) InteractOutline.Show(node);
-        else InteractOutline.Hide(node);
+        if (_currentComponent == null) _current = null;
+        if (target == _current) return;
+
+        if (_currentComponent != null) InteractOutline.Hide(_currentComponent);
+
+        _current = target;
+        _currentComponent = target as Component;
+
+        if (_currentComponent != null && !(_current is BuildSite))
+            InteractOutline.Show(_currentComponent);
     }
 
     private void OnDisable()
     {
-        SetHighlight(_currentItem, false);
-        _currentItem = null;
+        if (_currentComponent != null) InteractOutline.Hide(_currentComponent);
+        _current = null;
+        _currentComponent = null;
     }
 
-    private void Pickup()
+    private void OnDrawGizmos()
     {
-        if (_currentItem == null)
-            return;
-
-        ResourceType resourceType = _currentItem.GetItemData();
-
-        DroppedItem dropped = _currentItem.GetComponent<DroppedItem>();
-        if (dropped != null)
-        {
-            if (resourceType != null && InventoryManager.Instance.AddItem(resourceType))
-            {
-                dropped.Interact();
-                SetHighlight(_currentItem, false);
-                _currentItem = null;
-            }
-            return;
-        }
-
-        IInteractable interactable = _currentItem.GetComponent<IInteractable>();
-        if (!interactable.CanInteract) return;
-        interactable.Interact();
-
-        if (resourceType == null)
-            return;
-
-        if (InventoryManager.Instance.AddItem(resourceType))
-        {
-            SetHighlight(_currentItem, false);
-            _currentItem = null;
-        }
-    }
-
-    void OnDrawGizmos()
-    {
+        if (playerCamera == null) return;
         Gizmos.color = Color.red;
         Gizmos.DrawLine(playerCamera.transform.position, playerCamera.transform.position + playerCamera.transform.forward * pickupDistance);
     }

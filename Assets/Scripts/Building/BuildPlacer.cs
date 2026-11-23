@@ -5,6 +5,8 @@ public class BuildPlacer : MonoBehaviourPun
 {
     public static BuildPlacer Local { get; private set; }
     public static bool IsPlacing => Local != null && Local.ghost != null;
+    public static bool BlocksMouse => IsPlacing || RecipeBookUI.IsOpen || Time.frameCount == mouseUsedFrame;
+    static int mouseUsedFrame = -1;
     public Camera Camera => cam;
 
     [SerializeField] Camera cam;
@@ -97,6 +99,7 @@ public class BuildPlacer : MonoBehaviourPun
 
         if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
         {
+            mouseUsedFrame = Time.frameCount;
             Cancel();
             return;
         }
@@ -108,7 +111,11 @@ public class BuildPlacer : MonoBehaviourPun
         UpdatePose();
         UpdateValidity();
 
-        if (Input.GetMouseButtonDown(0) && isValid) Place();
+        if (Input.GetMouseButtonDown(0))
+        {
+            mouseUsedFrame = Time.frameCount;
+            if (isValid) Place();
+        }
     }
 
     void Place()

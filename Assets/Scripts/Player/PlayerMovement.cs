@@ -1,20 +1,15 @@
 using Photon.Pun;
 using UnityEngine;
 
-/// <summary>
-/// Простий FPS-рух через CharacterController: WASD + миша + стрибок, без присідання/спринту
-/// (як в Overwatch). Керує тільки локальний гравець — інші клієнти бачать рух через
-/// звичайну синхронізацію Transform, а анімацію third-person читає PlayerVisuals.
-/// </summary>
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(PhotonView))]
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Camera")]
-    [Tooltip("Дочірній transform камери — нахиляється вгору/вниз, тіло гравця обертається окремо (лише по Y)")]
+    [Tooltip("Child camera transform. Pitches up/down, the body rotates only around Y")]
     public Transform playerCamera;
 
-    [Tooltip("Камера рук (Overlay, малює лише шар Weapon). У чужих гравців вимикається разом з руками")]
+    [Tooltip("Hands camera (Overlay, renders only the Weapon layer). Disabled on remote players")]
     public GameObject weaponCamera;
 
     [Header("Movement")]
@@ -43,16 +38,10 @@ public class PlayerMovement : MonoBehaviour
 
     void Start()
     {
-        // Камера/аудіо-слухач вмикаються лише в локального гравця — інакше на екрані
-        // буде по камері на кожного гравця в кімнаті
         bool isMine = _photonView.IsMine;
 
         if (playerCamera != null)
         {
-            // GetComponentsInChildren (множина!) — камер може бути дві: основна
-            // і окрема "камера зброї" (Depth Only, малює лише шар зброї, щоб не
-            // клипало у стіни). Якщо лишити ввімкненою хоч одну чужу — вона малює
-            // без перевірки глибини і "просвічує" крізь усе на екрані.
             foreach (Camera cam in playerCamera.GetComponentsInChildren<Camera>(true))
                 cam.enabled = isMine;
 
@@ -60,7 +49,6 @@ public class PlayerMovement : MonoBehaviour
                 listener.enabled = isMine;
         }
 
-        // Руки чужого гравця лежать на шарі Weapon — без цього наша камера рук малювала б їх поверх усього
         if (weaponCamera != null && !isMine)
             weaponCamera.SetActive(false);
 
@@ -74,8 +62,9 @@ public class PlayerMovement : MonoBehaviour
     {
         if (!_photonView.IsMine) return;
 
-        Look();
-        Move();
+        bool frozen = RecipeBookUI.IsOpen;
+        if (!frozen) Look();
+        Move(frozen);
     }
 
     void Look()
@@ -90,18 +79,18 @@ public class PlayerMovement : MonoBehaviour
             playerCamera.localEulerAngles = new Vector3(_pitch, 0f, 0f);
     }
 
-    void Move()
+    void Move(bool frozen)
     {
-        float x = Input.GetAxisRaw("Horizontal");
-        float z = Input.GetAxisRaw("Vertical");
+        float x = frozen ? 0f : Input.GetAxisRaw("Horizontal");
+        float z = frozen ? 0f : Input.GetAxisRaw("Vertical");
 
         Vector3 move = (transform.right * x + transform.forward * z).normalized * moveSpeed;
 
         if (_controller.isGrounded)
         {
-            _verticalVelocity = -1f; // невеликий "притиск" до землі, щоб isGrounded не мигав
+            _verticalVelocity = -1f;
 
-            if (Input.GetButtonDown("Jump"))
+            if (!frozen && Input.GetButtonDown("Jump"))
                 _verticalVelocity = jumpForce;
         }
         else
