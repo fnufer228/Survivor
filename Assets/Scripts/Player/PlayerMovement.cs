@@ -48,11 +48,8 @@ public class PlayerMovement : MonoBehaviour
             foreach (AudioListener listener in playerCamera.GetComponentsInChildren<AudioListener>(true))
                 listener.enabled = isMine;
         }
-
         if (weaponCamera != null && !isMine)
             weaponCamera.SetActive(false);
-
-        if (!isMine) return;
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible   = false;

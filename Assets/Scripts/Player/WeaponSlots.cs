@@ -1,11 +1,6 @@
 using System;
 using UnityEngine;
 
-/// <summary>
-/// Слоти рук. Слот 0 — просто руки без предмета, слоти 1..N — руки з предметом.
-/// Клавіші 1..9 вмикають слот; повторне натискання на активний слот повертає слот 0.
-/// Висить на WeaponCamera: у чужих гравців вона вимкнена, тож перемикає лише локальний гравець.
-/// </summary>
 public class WeaponSlots : MonoBehaviour
 {
     [Tooltip("Слот 0 — просто руки")]
@@ -18,6 +13,8 @@ public class WeaponSlots : MonoBehaviour
     [SerializeField] private GameObject[] slots = new GameObject[2];
 
     public int CurrentSlot { get; private set; }
+
+    public bool InputEnabled { get; set; } = true;
 
     public event Action<int> SlotChanged;
 
@@ -34,6 +31,8 @@ public class WeaponSlots : MonoBehaviour
 
     private void Update()
     {
+        if (!InputEnabled) return;
+
         for (int i = 1; i <= slotCount; i++)
         {
             if (Input.GetKeyDown(KeyCode.Alpha0 + i))
@@ -44,7 +43,6 @@ public class WeaponSlots : MonoBehaviour
         }
     }
 
-    /// <summary>Як натискання клавіші слота: той самий слот ще раз — повернення до порожніх рук.</summary>
     public void PressSlot(int slot)
     {
         Select(slot == CurrentSlot ? 0 : slot);
@@ -56,12 +54,15 @@ public class WeaponSlots : MonoBehaviour
         CurrentSlot = slot;
 
         GameObject shown = slot > 0 && slot <= slots.Length ? slots[slot - 1] : null;
-        if (shown == null) shown = emptyHands; // порожній слот — просто руки
 
-        if (emptyHands != null) emptyHands.SetActive(shown == emptyHands);
-        foreach (GameObject hands in slots)
-            if (hands != null && hands != emptyHands)
-                hands.SetActive(hands == shown);
+        if (emptyHands != null) emptyHands.SetActive(true);
+        foreach (GameObject item in slots)
+            if (item != null && item != emptyHands)
+                item.SetActive(item == shown);
+
+        HandPose pose = shown != null ? shown.GetComponent<HandPose>() : null;
+        if (pose == null && emptyHands != null) pose = emptyHands.GetComponent<HandPose>();
+        if (pose != null) pose.Apply();
 
         SlotChanged?.Invoke(slot);
     }

@@ -29,6 +29,14 @@ public class InventoryManager : MonoBehaviour
         if (item == null || amount <= 0)
             return false;
 
+        if (item.maxAmount > 0)
+        {
+            int free = item.maxAmount - GetItemAmount(item);
+            if (free <= 0)
+                return false;
+            amount = Mathf.Min(amount, free);
+        }
+
         int remaining = amount;
 
         foreach (InventorySlot slot in items)

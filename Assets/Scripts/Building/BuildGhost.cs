@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -6,12 +7,23 @@ public class BuildGhost : MonoBehaviour
     static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
     static readonly int ColorId = Shader.PropertyToID("_Color");
 
+    class Part
+    {
+        public BuildPart Source;
+        public Renderer Renderer;
+        public Material[] GhostMaterials;
+        public bool Filled;
+    }
+
     Renderer[] renderers;
     MaterialPropertyBlock block;
     Color currentColor;
     bool hasColor;
+    readonly List<Part> parts = new List<Part>();
+    readonly HashSet<Renderer> filledRenderers = new HashSet<Renderer>();
 
     public Bounds LocalBounds { get; private set; }
+    public bool HasParts => parts.Count > 0;
 
     public static BuildGhost Create(BuildingRecipe recipe, Material material)
     {
@@ -24,6 +36,18 @@ public class BuildGhost : MonoBehaviour
 
         foreach (Collider col in root.GetComponentsInChildren<Collider>(true))
             Destroy(col);
+
+        var partRenderers = new Dictionary<Renderer, BuildPart>();
+        var keepMaterials = new HashSet<Renderer>();
+        foreach (BuildPart part in root.GetComponentsInChildren<BuildPart>(true))
+        {
+            if (part.TryGetComponent(out Renderer partRenderer))
+            {
+                partRenderers[partRenderer] = part;
+                keepMaterials.Add(partRenderer);
+            }
+            if (part.outline != null) keepMaterials.Add(part.outline);
+        }
 
         Renderer[] found = root.GetComponentsInChildren<Renderer>(true);
         bool hasBounds = false;
@@ -44,7 +68,7 @@ public class BuildGhost : MonoBehaviour
                 }
             }
 
-            if (material != null)
+            if (material != null && !keepMaterials.Contains(r))
             {
                 var mats = new Material[Mathf.Max(1, r.sharedMaterials.Length)];
                 for (int i = 0; i < mats.Length; i++) mats[i] = material;
@@ -58,6 +82,17 @@ public class BuildGhost : MonoBehaviour
         ghost.renderers = found;
         ghost.block = new MaterialPropertyBlock();
         ghost.LocalBounds = hasBounds ? bounds : new Bounds(Vector3.up * 0.5f, Vector3.one);
+
+        foreach (var pair in partRenderers)
+        {
+            ghost.parts.Add(new Part
+            {
+                Source = pair.Value,
+                Renderer = pair.Key,
+                GhostMaterials = pair.Key.sharedMaterials
+            });
+        }
+        ghost.parts.Sort((a, b) => a.Source.transform.GetSiblingIndex().CompareTo(b.Source.transform.GetSiblingIndex()));
         return ghost;
     }
 
@@ -86,6 +121,53 @@ public class BuildGhost : MonoBehaviour
         return root;
     }
 
+    public void SetProgress(int costIndex, int delivered, int required)
+    {
+        int count = 0;
+        foreach (Part p in parts)
+            if (p.Source.costIndex == costIndex) count++;
+        if (count == 0) return;
+
+        int filled = required <= 0
+            ? count
+            : Mathf.Clamp(Mathf.FloorToInt((float)delivered * count / required + 0.0001f), 0, count);
+
+        int index = 0;
+        foreach (Part p in parts)
+        {
+            if (p.Source.costIndex != costIndex) continue;
+            SetFilled(p, index < filled);
+            index++;
+        }
+    }
+
+    void SetFilled(Part part, bool value)
+    {
+        if (part.Filled == value) return;
+        part.Filled = value;
+        Renderer r = part.Renderer;
+
+        if (value)
+        {
+            Material[] solid = part.Source.solidMaterials;
+            if (solid != null && solid.Length > 0) r.sharedMaterials = solid;
+            r.SetPropertyBlock(null);
+            r.shadowCastingMode = ShadowCastingMode.On;
+            r.receiveShadows = true;
+            filledRenderers.Add(r);
+        }
+        else
+        {
+            r.sharedMaterials = part.GhostMaterials;
+            r.shadowCastingMode = ShadowCastingMode.Off;
+            r.receiveShadows = false;
+            filledRenderers.Remove(r);
+            if (hasColor) ApplyColor(r, currentColor);
+        }
+
+        if (part.Source.outline != null) part.Source.outline.enabled = !value;
+    }
+
     public void SetColor(Color color)
     {
         if (hasColor && color == currentColor) return;
@@ -94,11 +176,16 @@ public class BuildGhost : MonoBehaviour
 
         foreach (Renderer r in renderers)
         {
-            if (r == null) continue;
-            r.GetPropertyBlock(block);
-            block.SetColor(BaseColorId, color);
-            block.SetColor(ColorId, color);
-            r.SetPropertyBlock(block);
+            if (r == null || filledRenderers.Contains(r)) continue;
+            ApplyColor(r, color);
         }
+    }
+
+    void ApplyColor(Renderer r, Color color)
+    {
+        r.GetPropertyBlock(block);
+        block.SetColor(BaseColorId, color);
+        block.SetColor(ColorId, color);
+        r.SetPropertyBlock(block);
     }
 }

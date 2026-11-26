@@ -281,7 +281,11 @@ public class ResourceManager : MonoBehaviourPunCallbacks
     {
         if (node.Type.drop == null || node.Type.drop.item == null || node.Type.harvestMode == HarvestMode.Pickup) return;
         if (DropManager.Instance != null)
+
             DropManager.Instance.SpawnDrops(node.Type.drop, node.transform.position);
+        if (node.Type.extraDrops == null) return;
+        foreach (RandomDrop extra in node.Type.extraDrops)
+            DropManager.Instance.SpawnRandom(extra, node.transform.position);
     }
     bool CanAct(int id, HarvestMode mode, Player sender) =>
         IsValid(id) &&

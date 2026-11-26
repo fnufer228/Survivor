@@ -36,6 +36,11 @@ public class BuildPlacer : MonoBehaviourPun
     [SerializeField] KeyCode cancelKey = KeyCode.C;
     [SerializeField] float cancelHoldTime = 1f;
 
+    [Header("Deliver to blueprint")]
+    [SerializeField] KeyCode deliverKey = KeyCode.E;
+    [Tooltip("Seconds between items while the key is held")]
+    [SerializeField] float deliverRepeat = 0.2f;
+
     [Header("Keys")]
     [SerializeField] KeyCode rotateKey = KeyCode.R;
 
@@ -51,6 +56,7 @@ public class BuildPlacer : MonoBehaviourPun
 
     float cancelTimer;
     bool waitCancelRelease;
+    float nextDeliver;
 
     void Start()
     {
@@ -93,6 +99,7 @@ public class BuildPlacer : MonoBehaviourPun
 
         if (ghost == null)
         {
+            UpdateDeliver();
             UpdateBlueprintCancel();
             return;
         }
@@ -213,10 +220,7 @@ public class BuildPlacer : MonoBehaviourPun
 
         if (waitCancelRelease) return;
 
-        BuildSite site = null;
-        Ray ray = new Ray(cam.transform.position, cam.transform.forward);
-        if (Physics.Raycast(ray, out RaycastHit hit, cancelReach, blueprintMask, QueryTriggerInteraction.Collide))
-            site = hit.collider.GetComponentInParent<BuildSite>();
+        BuildSite site = AimedSite();
 
         if (site == null)
         {
@@ -233,6 +237,31 @@ public class BuildPlacer : MonoBehaviourPun
             waitCancelRelease = true;
             if (BuildingManager.Instance != null) BuildingManager.Instance.RequestCancel(site);
         }
+    }
+
+    BuildSite AimedSite()
+    {
+        Ray ray = new Ray(cam.transform.position, cam.transform.forward);
+        if (Physics.Raycast(ray, out RaycastHit hit, cancelReach, blueprintMask, QueryTriggerInteraction.Collide))
+            return hit.collider.GetComponentInParent<BuildSite>();
+        return null;
+    }
+
+    void UpdateDeliver()
+    {
+        if (!Input.GetKey(deliverKey))
+        {
+            nextDeliver = 0f;
+            return;
+        }
+
+        if (Time.time < nextDeliver) return;
+
+        BuildSite site = AimedSite();
+        if (site == null) return;
+
+        nextDeliver = Time.time + deliverRepeat;
+        site.Interact();
     }
 
     void ResetCancel()

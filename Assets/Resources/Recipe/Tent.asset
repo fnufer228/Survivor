@@ -16,9 +16,11 @@ MonoBehaviour:
   description: 
   picture: {fileID: -6891432356929926455, guid: 3ca9afe63812fd34fa570b7745f64e99, type: 3}
   costs:
-  - resource: {fileID: 0}
+  - resource: {fileID: 11400000, guid: badf1f0bac8223349bb642e08baa9707, type: 2}
     amount: 10
+  - resource: {fileID: 11400000, guid: 79769d6abd90b274a895aa32db854445, type: 2}
+    amount: 15
   buildingPrefab: {fileID: 6746327246048892674, guid: cd3ba06512253a04b95c8c6664d874a7, type: 3}
-  ghostPrefab: {fileID: 6746327246048892674, guid: cd3ba06512253a04b95c8c6664d874a7, type: 3}
+  ghostPrefab: {fileID: 4084248131052825137, guid: e8acb033fb85fc144b171b16be23e00e, type: 3}
   rotationStep: 15
   groundOffset: 0

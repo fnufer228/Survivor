@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01e68e513b44a6d4aa4931024c0fb17b, type: 3}
+  m_Name: Stone
+  m_EditorClassIdentifier: Assembly-CSharp::BuildResource
+  id: stone
+  displayName: Stone
+  icon: {fileID: -4625990157244809167, guid: 0f6eec8c402e3fa4f9d7a5db45e6cc8f, type: 3}
+  inventoryItem: {fileID: 11400000, guid: fda83ef3597b95945aec4c9e2670b916, type: 2}
+  dropItem: {fileID: 11400000, guid: 1ddae4c3da4720d4287b7d4d16983623, type: 2}
+  carriedInHands: 0

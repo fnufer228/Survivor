@@ -8,7 +8,6 @@ public class DayNightManager : MonoBehaviour
 {
     public static DayNightManager Instance { get; private set; }
 
-    // Момент старту світу (PhotonNetwork.Time майстра) у властивостях кімнати
     public const string StartTimeKey = "dayStart";
 
     [Header("Time")]
@@ -109,8 +108,6 @@ public class DayNightManager : MonoBehaviour
             : Mathf.Repeat(0.75f + 0.5f * ((p - dayDuration) / nightDuration), 1f);
     }
 
-    // Скільки секунд минуло від старту світу. Сам PhotonNetwork.Time — це годинник сервера,
-    // не кімнати, тому без цього гравець заходив у випадковий час доби (часто вночі).
     double RoomElapsed()
     {
         if (double.IsNaN(roomStartTime))

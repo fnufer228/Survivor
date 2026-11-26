@@ -2,7 +2,6 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-/// <summary>Малює кості для всіх BonesView у поточній сцені або в режимі редагування префаба.</summary>
 [InitializeOnLoad]
 public static class BonesViewDrawer
 {

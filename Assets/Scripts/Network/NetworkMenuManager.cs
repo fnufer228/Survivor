@@ -50,8 +50,8 @@ public class NetworkMenuManager : MonoBehaviourPunCallbacks
     private void Start()
     {
         HideEnterPasswordPanel();
-        ShowSearch(false);
-        SetStatus("Connecting to server...");
+        ShowPanel();
+        SetStatus(string.Empty);
         SetPlayButton(false);
 
         if (btnPlay != null) btnPlay.onClick.AddListener(OnPlayClicked);
@@ -82,7 +82,7 @@ public class NetworkMenuManager : MonoBehaviourPunCallbacks
 
     public override void OnConnectedToMaster()
     {
-        SetStatus("Connected. Ready to play!");
+        SetStatus(string.Empty);
         SetPlayButton(true);
         PhotonNetwork.JoinLobby();
         CursorController.Set(this, true);
@@ -91,9 +91,8 @@ public class NetworkMenuManager : MonoBehaviourPunCallbacks
     public override void OnDisconnected(DisconnectCause cause)
     {
         Debug.LogWarning($"[GameManager] Disconnected: {cause}");
-        SetStatus("No connection. Reconnecting...");
+        SetStatus("Reconnecting...");
         SetPlayButton(false);
-        ShowSearch(false);
         PhotonNetwork.ConnectUsingSettings();
     }
 
@@ -104,8 +103,7 @@ public class NetworkMenuManager : MonoBehaviourPunCallbacks
         if (!PhotonNetwork.IsConnectedAndReady) return;
 
         SetPlayButton(false);
-        ShowSearch(true);
-        SetStatus("Searching for a room...");
+        SetStatus("Loading");
 
         // Спершу пробуємо зайти у вже існуючу кімнату
         PhotonNetwork.JoinRandomRoom();
@@ -137,8 +135,7 @@ public class NetworkMenuManager : MonoBehaviourPunCallbacks
 
     public override void OnLeftRoom()
     {
-        ShowSearch(false);
-        SetStatus("Search cancelled");
+        SetStatus(string.Empty);
         SetPlayButton(true);
     }
 
@@ -167,7 +164,9 @@ public class NetworkMenuManager : MonoBehaviourPunCallbacks
     }
     private void SetStatus(string text)
     {
-        if (txtStatus != null) txtStatus.text = text;
+        if (txtStatus == null) return;
+        txtStatus.text = text;
+        txtStatus.gameObject.SetActive(!string.IsNullOrEmpty(text));
     }
 
     private void SetPlayButton(bool active)
@@ -175,9 +174,9 @@ public class NetworkMenuManager : MonoBehaviourPunCallbacks
         if (btnPlay != null) btnPlay.interactable = active;
     }
 
-    private void ShowSearch(bool searching)
+    private void ShowPanel()
     {
-        if (menuPanel != null) menuPanel.SetActive(!searching);
-        if (searchPanel != null) searchPanel.SetActive(searching);
+        if (menuPanel != null) menuPanel.SetActive(true);
+        if (searchPanel != null) searchPanel.SetActive(true);
     }
 }

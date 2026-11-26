@@ -49,6 +49,14 @@ public class DropManager : MonoBehaviourPunCallbacks
         for (int i = 0; i < amount; i++) Spawn(entry.item, center);
     }
 
+    public void SpawnRandom(RandomDrop drop, Vector3 center)
+    {
+        if (!PhotonNetwork.IsMasterClient || drop == null || drop.item == null) return;
+
+        int amount = Random.Range(drop.min, Mathf.Max(drop.min, drop.max) + 1);
+        for (int i = 0; i < amount; i++) Spawn(drop.item, center);
+    }
+
     public void Spawn(PickupItemType type, Vector3 center)
     {
         if (!PhotonNetwork.IsMasterClient || type == null) return;
