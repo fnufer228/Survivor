@@ -16,8 +16,8 @@ MonoBehaviour:
   description: 
   picture: {fileID: -4701791936034880536, guid: fd0ebe3ce440f7244839de340ecabd9c, type: 3}
   costs:
-  - resource: {fileID: 11400000, guid: badf1f0bac8223349bb642e08baa9707, type: 2}
-    amount: 5
+  - resource: {fileID: 11400000, guid: d7a1ac49d35e2984882b02b6037f1d68, type: 2}
+    amount: 3
   - resource: {fileID: 11400000, guid: 9ac3aa971ac6b20418efc86463f1f4d0, type: 2}
     amount: 10
   buildingPrefab: {fileID: 8060533066185464670, guid: a4dcd663498ecf448886e3031f7d3ad1, type: 3}

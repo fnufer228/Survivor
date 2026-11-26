@@ -6,6 +6,7 @@ using UnityEngine;
 public class DropManager : MonoBehaviourPunCallbacks
 {
     public static DropManager Instance { get; private set; }
+    public static event System.Action<PickupItemType, int> LocalPicked;
 
     [Tooltip("Every Pickup Item that can be dropped. Same order on all clients")]
     [SerializeField] PickupItemType[] itemTypes;
@@ -79,6 +80,24 @@ public class DropManager : MonoBehaviourPunCallbacks
         photonView.RPC(nameof(RPC_Spawn), RpcTarget.All, id, index, pos, rotY, PhotonNetwork.ServerTimestamp);
     }
 
+    public void RequestDrop(PickupItemType type, Vector3 position)
+    {
+        int index = System.Array.IndexOf(itemTypes, type);
+        if (index < 0) return;
+        photonView.RPC(nameof(RPC_RequestDrop), RpcTarget.MasterClient, index, position);
+    }
+
+    [PunRPC]
+    void RPC_RequestDrop(int typeIndex, Vector3 position, PhotonMessageInfo info)
+    {
+        if (!PhotonNetwork.IsMasterClient || typeIndex < 0 || typeIndex >= itemTypes.Length) return;
+        if (!NetworkPlayer.IsNear(info.Sender, position, maxReachDistance)) return;
+
+        float rotY = Random.Range(0f, 360f);
+        int id = nextId++;
+        photonView.RPC(nameof(RPC_Spawn), RpcTarget.All, id, typeIndex, position, rotY, PhotonNetwork.ServerTimestamp);
+    }
+
     public void Pickup(DroppedItem item)
     {
         if (item == null) return;
@@ -130,7 +149,10 @@ public class DropManager : MonoBehaviourPunCallbacks
         RemoveLocal(id);
 
         if (actor == PhotonNetwork.LocalPlayer.ActorNumber && type != null)
+        {
+            LocalPicked?.Invoke(type, type.amount);
             Loot.GiveLocal(type.ResolveInventoryItem(), type.amount);
+        }
     }
 
     void Update()

@@ -36903,7 +36903,7 @@ MonoBehaviour:
   labelHeight: 0.1
   labelDistance: 12
   maxReach: 12
-  freeHandResources: 1
+  freeHandResources: 0
 --- !u!114 &756436053
 MonoBehaviour:
   m_ObjectHideFlags: 0
