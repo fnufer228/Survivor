@@ -7,6 +7,8 @@ public class LogCarrier : MonoBehaviourPun, IHandCarrier, IPunObservable
     [SerializeField] private PickupItemType logItem;
     [SerializeField] private BuildResource logResource;
     [SerializeField] private WeaponSlots slots;
+    [Tooltip("Hand pose while carrying logs on the shoulder")]
+    [SerializeField] private HandPose carryPose;
     [Tooltip("Log models in the hands, one per carried log")]
     [SerializeField] private GameObject[] logVisuals;
     [SerializeField] [Range(1, 4)] private int maxLogs = 2;
@@ -119,17 +121,20 @@ public class LogCarrier : MonoBehaviourPun, IHandCarrier, IPunObservable
             for (int i = 0; i < logVisuals.Length; i++)
                 if (logVisuals[i] != null) logVisuals[i].SetActive(i < carried);
 
-        KeepHandsEmpty();
+        if (carried > 0)
+        {
+            if (slots != null && slots.CurrentSlot != 0) slots.Select(0);
+            if (carryPose != null) carryPose.Apply();
+        }
+        else if (slots != null)
+        {
+            slots.Select(slots.CurrentSlot);
+        }
     }
 
     private void LateUpdate()
     {
-        KeepHandsEmpty();
-    }
-
-    private void KeepHandsEmpty()
-    {
-        if (slots != null && carried > 0 && slots.CurrentSlot != 0) slots.Select(0);
+        if (carried > 0 && slots != null && slots.CurrentSlot != 0) Refresh();
     }
 
     public bool IsCarrying(BuildResource resource)
