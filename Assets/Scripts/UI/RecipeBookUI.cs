@@ -1,3 +1,4 @@
+using Photon.Pun;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,17 +21,27 @@ public class RecipeBookUI : MonoBehaviour
     [SerializeField] KeyCode previousKey = KeyCode.A;
     [SerializeField] KeyCode nextKey = KeyCode.D;
 
+    [Header("Clicking pages on the 3D book")]
+    [Tooltip("Layer of the page quads with BookPageSurface")]
+    [SerializeField] LayerMask pageSurfaceMask;
+    [SerializeField] float clickDistance = 3f;
+
     [Header("Optional")]
     [SerializeField] TMP_Text pageLabel;
     [SerializeField] Button previousButton;
     [SerializeField] Button nextButton;
 
     int spread;
+    PhotonView ownerView;
+
+    bool IsLocal => ownerView == null || ownerView.IsMine;
 
     int SpreadCount => Mathf.Max(1, Mathf.CeilToInt(recipes.Length / (float)pages.Length));
 
     void Awake()
     {
+        ownerView = GetComponentInParent<PhotonView>();
+
         foreach (RecipePageUI page in pages)
             if (page != null) page.Selected += OnPageSelected;
 
@@ -41,17 +52,19 @@ public class RecipeBookUI : MonoBehaviour
             Debug.LogError("RecipeBookUI: Root must be a child object, otherwise the book can not be opened again", this);
 
         root.SetActive(false);
-        IsOpen = false;
+        if (IsLocal) IsOpen = false;
     }
 
     void OnDestroy()
     {
-        IsOpen = false;
+        if (IsLocal) IsOpen = false;
         CursorController.Hide(this);
     }
 
     void Update()
     {
+        if (!IsLocal) return;
+
         if (Input.GetKeyDown(toggleKey))
         {
             SetOpen(!IsOpen);
@@ -63,6 +76,21 @@ public class RecipeBookUI : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape)) SetOpen(false);
         else if (Input.GetKeyDown(previousKey) || Input.GetKeyDown(KeyCode.LeftArrow)) PreviousSpread();
         else if (Input.GetKeyDown(nextKey) || Input.GetKeyDown(KeyCode.RightArrow)) NextSpread();
+        else if (Input.GetMouseButtonUp(0)) TryClickPage();
+    }
+
+    void TryClickPage()
+    {
+        if (pageSurfaceMask.value == 0) return;
+
+        Camera cam = BuildPlacer.Local != null ? BuildPlacer.Local.Camera : Camera.main;
+        if (cam == null) return;
+
+        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+        if (!Physics.Raycast(ray, out RaycastHit hit, clickDistance, pageSurfaceMask, QueryTriggerInteraction.Collide)) return;
+
+        BookPageSurface surface = hit.collider.GetComponentInParent<BookPageSurface>();
+        if (surface != null && surface.Page != null) surface.Page.Select();
     }
 
     public void SetOpen(bool open)

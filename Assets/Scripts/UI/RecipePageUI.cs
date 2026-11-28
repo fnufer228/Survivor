@@ -25,11 +25,14 @@ public class RecipePageUI : MonoBehaviour
 
     readonly List<RecipeCostRowUI> rows = new List<RecipeCostRowUI>();
     bool initialized;
+    PageRenderTarget renderTarget;
 
     void Init()
     {
         if (initialized) return;
         initialized = true;
+        renderTarget = GetComponent<PageRenderTarget>();
+
         if (rowTemplate == null && content != null && content.childCount > 0)
         {
             Transform first = content.GetChild(0);
@@ -37,14 +40,19 @@ public class RecipePageUI : MonoBehaviour
                 rowTemplate = first.gameObject.AddComponent<RecipeCostRowUI>();
         }
 
-        if (rowTemplate != null) rowTemplate.gameObject.SetActive(false);
+        if (rowTemplate != null)
+        {
+            if (rowTemplate.gameObject.scene.IsValid()) rowTemplate.gameObject.SetActive(false);
+        }
         else Debug.LogError("RecipePageUI: Content has no resource icon to use as a template", this);
 
         if (selectButton != null)
-            selectButton.onClick.AddListener(() =>
-            {
-                if (Recipe != null) Selected?.Invoke(this);
-            });
+            selectButton.onClick.AddListener(Select);
+    }
+
+    public void Select()
+    {
+        if (Recipe != null) Selected?.Invoke(this);
     }
 
     public void Show(BuildingRecipe recipe)
@@ -63,6 +71,8 @@ public class RecipePageUI : MonoBehaviour
         if (selectButton != null) selectButton.interactable = hasRecipe;
 
         ShowCosts(hasRecipe ? recipe.costs : null);
+
+        if (renderTarget != null) renderTarget.Refresh();
     }
 
     void ShowCosts(RecipeCost[] costs)
